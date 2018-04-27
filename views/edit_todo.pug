@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    h1 #{title}
+    form(method='POST', action=ref)
+        #form-group
+            label Title:
+            input.form-control(name='title', type='text', value=todo.title)
+        #form-group
+            label Description:
+            textarea.form-control(name='desc') #{todo.desc}
+        br
+        input.btn.btn-primary(type='submit', value='Submit')
