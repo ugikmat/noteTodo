@@ -8,13 +8,24 @@ block content
     textarea.form-control(rows='4', cols='50', readonly='')=todo.desc
     hr
     a.btn.btn-default(href=refEdit) Edit
-    a.btn.btn-danger.delete-todo(href='#', data-id=todo._id) Delete
+    if(todo.detail!=null)
+        a.btn.btn-danger.delete-todo(href='#', data-id=todo._id) Delete
+    else
+        a.btn.btn-danger.delete-detail(href='#', data-id=id, detail-id=todo._id) Delete
     a.btn.btn-primary.float-right(href=ref) #{stats}
-    - var index=0;
     if(todo.detail!=null)
         hr
         a.btn.btn-default(href='/todos/add/detail/'+todo._id) Tambah Detail
+        hr
         ul.list-group
             each todoD, i in todo.detail
-                li.list-group-item
-                    a(href='/todos/'+todo._id+'/'+todoD._id)=todoD.title
+                if !todoD.finish
+                    li.list-group-item
+                        a(href='/todos/'+todo._id+'/'+todoD._id)=todoD.title
+        hr
+        p Finished
+        ul.list-group
+            each todoD, i in todo.detail
+                if todoD.finish
+                    li.list-group-item
+                        a(href='/todos/'+todo._id+'/'+todoD._id)=todoD.title

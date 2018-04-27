@@ -64,12 +64,10 @@ router.post('/add/:id',function(req,res){
             errors:errors
         });
     else{
-        console.log('Pass');
         Todo.findById(req.params.id, function(err, todo){
             if(err){
                 console.log(err);
             }else{
-                console.log('Pass Two');
                 todo.detail.push({ title:req.body.title,desc:req.body.desc,finish:false});
                 todo.save(function (err) {
                     if (err){
@@ -78,7 +76,7 @@ router.post('/add/:id',function(req,res){
                     }else{
                         console.log('Finish');
                         req.flash('success','Detail Todo Added');
-                        res.redirect('/');
+                        res.redirect('/todos/'+req.params.id);
                     }
                   });
             }
@@ -185,6 +183,29 @@ router.get('/finish/:id',function(req,res){
     });
 });
 
+//Finish/UnFinish Detail Todo
+router.get('/finish/:id/:idd',function(req,res){
+    console.log('Updating');
+    Todo.findById(req.params.id, function(err, todo){
+        if(err){
+            console.log(err);
+        }else{
+            todo.detail.id(req.params.idd).finish=!todo.detail.id(req.params.idd).finish;
+            todo.save(function (err) {
+                if (err){
+                    console.log('Error');
+                    req.flash('failed',err);
+                    return;
+                }else{
+                    console.log('Finish');
+                    req.flash('success','Detail Todo Changed');
+                    res.redirect('/todos/'+req.params.id);
+                }
+              });
+        }
+    });
+});
+
 //Unfinish A Todo
 router.get('/unfinish/:id',function(req,res){
     console.log('Updating');
@@ -207,6 +228,29 @@ router.delete('/:id',function(req,res){
     req.flash('success','Todo Deleted');
     res.send('Success');
 });
+
+//Delete Detail Function
+router.delete('/:id/:idd',function(req,res){
+    Todo.findById(req.params.id, function(err, todo){
+        if(err){
+            console.log(err);
+        }else{
+            todo.detail.id(req.params.idd).remove();
+            todo.save(function (err) {
+                if (err){
+                    console.log('Error');
+                    req.flash('failed',err);
+                    return;
+                }else{
+                    console.log('Finish');
+                    req.flash('success','Detail Todo Deleted');
+                    res.send('success');
+                }
+              });
+        }
+    });
+});
+
 
 //get Single Todo Route
 router.get('/:id',function(req,res){
@@ -237,10 +281,11 @@ router.get('/:id/:idd',function(req,res){
         }else{
             let detail = todo.detail.id(req.params.idd);
             let refEdit = '/todos/edit/'+req.params.id+'/'+req.params.idd;
-            let ref = detail.finish?'/todos/unfinish/'+todo._id+'/'+detail._id:'/todos/finish/'+todo._id+'/'+detail._id;
+            let ref ='/todos/finish/'+todo._id+'/'+detail._id;
             let stats = detail.finish?'Belum Selesai':'Selesai';
             res.render('todo',{
                 title:todo.title,
+                id:todo._id,
                 todo:detail,
                 ref:ref,
                 refEdit:refEdit,
